@@ -17,7 +17,7 @@
 ## Installation
 1. Clone the repository
 ```bash
-git clone https://github.com/yousefkotp/Flare-Free-Vision-Empowering-Uformer-with-Depth-Insights.git
+git clone https://github.com/sfffffffffffff/DIP.git
 ```
 
 2. Install the requirements
@@ -32,7 +32,7 @@ python setup.py develop
 ```
 
 4. Install pretrained [Dense Vision Transformer](https://drive.google.com/file/d/1dgcJEYYw1F8qirXhZxgNK8dWWz_8gZBD/view) for Depth Prediction and put it in `DPT` folder.
-
+5.下载60k ir训练，模型与损失函数改进的预训练模型为：
 
 ## Dataset
 
