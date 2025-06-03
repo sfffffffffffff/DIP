@@ -1,0 +1,179 @@
+# GENERATE TIME: Tue Aug  8 18:55:51 2023
+# CMD:
+# basicsr/train.py -opt options/uformer_flare7kpp_baseline_option.yml --auto_resume
+
+# general settings
+name: Uformer_flare7kpp_baseline_option.yml
+model_type: DeflareModel
+scale: 1
+num_gpu: 1 # set num_gpu: 0 for cpu mode
+manual_seed: 0
+
+# dataset and data loader settings
+datasets:
+  train:
+    name: Flare7Kpp
+    type: Flare7kpp_Pair_Loader
+    image_path: dataset/Flickr24K
+    scattering_dict:
+      Flare7k_scattering: dataset/Flare7Kpp/Flare7K/Scattering_Flare/Compound_Flare
+      Real_scattering1: dataset/Flare7Kpp/Flare-R/Compound_Flare
+    reflective_dict: 
+      Flare7k_reflective: ~
+      Real_reflective1: ~
+    light_dict:
+      Flare7k_light: dataset/Flare7Kpp/Flare7K/Scattering_Flare/Light_Source
+      Real_light1: dataset/Flare7Kpp/Flare-R/Light_Source
+    data_ratio: [0.5, 0.5] # or [0.6, 0.4], only a ratio is enough
+    transform_base:
+      img_size: 512
+    transform_flare:
+      scale_min: 0.7
+      scale_max: 1.2
+      translate: 100
+      shear: 20
+    mask_type: ~
+    pin_memory: True
+    
+    
+    # data loader
+    use_shuffle: true
+    num_worker_per_gpu: 2 # 4 causes freezing sometimes
+    batch_size_per_gpu: 2
+    dataset_enlarge_ratio: 1
+    prefetch_mode: cuda
+
+  val:
+    name: flare_test
+    type: Image_Pair_Loader
+    dataroot_gt: dataset/Flare7Kpp/val/gt
+    dataroot_lq: dataset/Flare7Kpp/val/input
+    gt_size: 512
+
+# network structures
+network_g:
+  type: Uformer
+  img_size: 512
+  img_ch: 4
+  output_ch: 6
+  multi_stage: 1
+
+
+# path
+path:
+  pretrain_network_g: ~
+  strict_load_g: true
+  resume_state: ~
+
+# training settings
+train:
+  optim_g:
+    type: Adam
+    lr: !!float 1e-4
+    weight_decay: 0
+    betas: [0.9, 0.99]
+
+  scheduler:
+    type: MultiStepLR
+    milestones: [400000] 
+    gamma: 0.5
+
+  out_deflare: True
+  ema_decay: 0.9
+  total_iter: 60000
+  warmup_iter: -1
+
+  # 使用简化的损失配置
+  losses:
+    l1_opt:
+      type: L_Abs_pure
+      loss_weight: 0.5
+
+    perceptual:
+      type: L_percepture
+      loss_weight: 0.5
+
+    # 现在这些损失函数应该能够正确加载
+    fourier_loss:
+      type: FourierAwareLoss
+      loss_weight: 0.0005
+      num_freq_bands: 3
+      phase_weight: 0.1
+
+    global_consistency:
+      type: GlobalConsistencyLoss
+      loss_weight: 0.4
+      num_regions: 9
+      boundary_weight: 0.8
+
+    depth_aware:
+      type: DepthAwareLoss
+      loss_weight: 0.5
+      depth_weight: 2.0
+
+    multiscale_fourier:
+      type: MultiscaleFourierLoss
+      loss_weight: 0.001
+      scales: [1.0, 0.5, 0.25]
+      weights: [1.0, 0.8, 0.6]
+
+    contrastive_loss:
+      type: ContrastiveLoss
+      loss_weight: 0.1
+      temperature: 0.07
+      margin: 1.0
+      feature_dim: 128
+    light_source_guided:
+      type: UnsupervisedFlareRemovalLoss  # 或者 LightSourceGuidedLoss
+      loss_weight: 0.5
+      light_weight: 0.3
+      physics_weight: 0.4
+      smooth_weight: 0.2
+      content_weight: 0.1
+    # validation settings
+val:
+  val_freq: 500 
+  save_img: false
+
+  metrics:
+    psnr: # metric name, can be arbitrary
+      type: calculate_psnr
+      crop_border: 0
+      test_y_channel: false
+    ssim: # metric name, can be arbitrary
+      type: calculate_ssim
+      crop_border: 0
+      test_y_channel: false
+
+# logging settings
+logger:
+  print_freq: 100
+  save_checkpoint_freq: 500
+  use_tb_logger: true
+  wandb:
+    project: ~
+    resume_id: ~
+
+# dist training settings
+dist_params:
+  backend: nccl
+  port: 29500
+
+# Resume from iteration 1000 in archived experiment
+
+name: Uformer_flare7kpp_baseline_option.yml_archived_20250603_034105
+
+path:
+
+  resume_state: experiments/Uformer_flare7kpp_baseline_option.yml_archived_20250603_034105/training_states/1000.state
+
+  experiments_root: experiments
+
+  models: experiments/Uformer_flare7kpp_baseline_option.yml_archived_20250603_034105/models
+
+  training_states: experiments/Uformer_flare7kpp_baseline_option.yml_archived_20250603_034105/training_states
+
+  log: experiments/Uformer_flare7kpp_baseline_option.yml_archived_20250603_034105
+
+  visualization: experiments/Uformer_flare7kpp_baseline_option.yml_archived_20250603_034105/visualization
+
