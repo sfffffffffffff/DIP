@@ -1,9 +1,5 @@
-# Flare-Free Vision: Empowering Uformer with Depth Insights
-Image flare is a common problem that occurs when a camera lens is pointed at a strong light source. It can manifest as ghosting, blooming, or other artifacts that can degrade the image quality. We propose a novel deep learning approach for flare removal that uses a combination of depth estimation and image restoration. We use a Dense Vision Transformer to estimate the depth of the scene. This depth map is then concatenated to the input image, which is then fed into a Uformer, a general U-shaped transformer for image restoration. Our proposed method demonstrates state-of-the-art performance on the Flare7K++ test dataset, demonstrating its effectiveness in removing flare artifacts from images. Our approach also demonstrates robustness and generalization to real-world images with various types of flare. We believe that our work opens up new possibilities for using depth information for image restoration.
-
-<p align="center">
-  <img src="assets/comparison.jpg" alt="Comparison Example"/>
-</p>
+该项目在Flare-Free Vision的基础上进行修改，训练命令与评估命令未变，脚本内容与代码内容发生改变。
+注意运行时显示int 转变 torch为正常现象。
 
 ## Table of Contents
 - [Flare-Free Vision: Empowering Uformer with Depth Insights](#flare-free-vision-empowering-uformer-with-depth-insights)
